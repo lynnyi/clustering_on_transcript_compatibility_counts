@@ -7,7 +7,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 base_dir = '/home/lynnyi/clustering/clustering_on_transcript_compatibility_counts/Trapnell_pipeline/'
-directory = base_dir + '/singlecellquant2/singlecellquant2cluster0/'
 directory_class_files = base_dir + '/transcript_compatibility_counts/'
 
 
@@ -46,11 +45,6 @@ def normalize_counts(dictionary):
 def normalize_counts_with_log(dictionary):
 	values = dictionary.values()
 	median = np.median(values)
-	#if median == 0:
-	#	print('median is 0')
-	#else:
-	print('median')
-	print(median)
 	for key, value in dictionary.iteritems():
 		dictionary[key]=(value/median+1.0)
 	return dictionary
@@ -66,49 +60,31 @@ def merge_dicts(dicts):
 	return d
 
 
-x = map(read_classfile_into_dictionary, names[0])
-
-print('normalizing counts')
-x = map(normalize_counts_with_log, x)
-
-d = merge_dicts(x)
-num_samples = len(x)
-
-mean = []
-var = []
-for key, value in d.iteritems():
-	this_mean = np.sum(value) / num_samples
-	this_var = np.var(list(value) + list(np.zeros(num_samples - len(value))))
-	mean.append(np.log(this_mean))
-	var.append(np.log(this_var_)
+global num_samples
+global num_ECs
+def make_dictionary_of_TCCs(filenames):
+	x = map(read_classfile_into_dictionary, filenames)
+	print('normalizing counts')
+	x = map(normalize_counts, x)
+	d = merge_dicts(x)
+	global num_samples
+	global num_ECs
+	num_samples = len(x)
+	num_ECs = len(d.keys())
+	return d
 
 
 def plot_mean_var():
+	mean = []
+	var = []
+	for key, value in d.iteritems():
+		this_mean = np.sum(value) / num_samples
+		this_var = np.var(list(value) + list(np.zeros(num_samples - len(value))))
+	mean.append(np.log(this_mean))
+	var.append(np.log(this_var))
 	fig, ax = plt.subplots()
 	ax.scatter(mean,var)
  	plt.savefig('mean_var_tcc_log_log_plus_one.png')
 
 
-"""
-keys = get_unique_keys(x)
-print('number of unique keys')
-print(len(keys))
-"""
-"""
-means = []
-var = []
 
-def get_values(list_dict, key):
-	values = []
-	for dic in list_dict:
-		if key in dic.keys():
-			values.append(dic[key])
-		else:
-			values.append(0.0)
-	return values	
-
-for key in keys:
-	values = get_values(x, key)
-	means.append(np.mean(values))
-	var.append(np.var(values))
-"""
