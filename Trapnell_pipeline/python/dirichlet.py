@@ -30,16 +30,15 @@ assert(len(log_p)==num_ECs)
 
 #gradient of likelihood at specific point of alpha
 def gradient(alpha):
-	digamma_alpha_sum = sp.diagamma(np.sum(alpha))
-	
+	digamma_alpha_sum = sp.digamma(np.sum(alpha))
 	alpha = map(sp.digamma, alpha)	
-	alpha = log_p - digamma_alpha
+	alpha = np.array(log_p) - np.array(alpha)
 	alpha = [(a + digamma_alpha_sum) * num_samples for a in alpha] 
 	return alpha
 
 #given old alpha, update old alpha to give new alpha
 def update(old_alpha, step_size):
-	new_alpha = old_alpha + step_size*gradient(alpha)
+	new_alpha = old_alpha + step_size*np.array(gradient(old_alpha))
 	return new_alpha
 
 #given specific alpha, get likelihood over the dirichlet
