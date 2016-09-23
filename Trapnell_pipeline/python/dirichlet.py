@@ -21,7 +21,7 @@ num_samples = num_samples
 #log_p is the sum of the log of the kth component over all the samples
 def calculate_log_p(ec_counts):
 	log_ec_counts = [map(np.log, x) for x in ec_counts]
-	log_p = map(np.sum, log_ec_counts)
+	log_p = np.array([np.sum(x) for x in log_ec_counts]) 
 	log_p /= num_samples
 	return log_p
 
@@ -34,7 +34,6 @@ def gradient(alpha):
 	alpha = np.array(log_p) - np.array([sp.digamma(x) for x in alpha])
 	alpha += digamma_alpha_sum
 	alpha *= num_samples
-	#alpha = [(x + digamma_alpha_sum) * num_samples for x in alpha] 
 	return alpha
 
 #given old alpha, update old alpha to give new alpha
@@ -43,17 +42,23 @@ def update(alpha, step_size):
 	return alpha
 
 #given specific alpha, get likelihood over the dirichlet
-def likelihood(alpha):
-        log_gamma_sum = np.log(sp.gamma(np.sum(alpha)))
-	sum_log_gamma = np.sum([np.log(sp.gamma(x)) for x in alpha])
-        sum_dot_log_p = np.sum(np.dot([x-1 for x in alpha], log_p))
+def log_likelihood(alpha):
+        log_gamma_sum = sp.gammaln(np.sum(alpha))
+	print('1 alpha sum')
+	print(log_gamma_sum)
+	sum_log_gamma = np.sum([sp.gammaln(x) for x in alpha])
+        print('2 sum log gamma')
+	print(sum_log_gamma)
+	sum_dot_log_p = np.sum(np.dot([x-1 for x in alpha], log_p))
+	print('3 sum_dot_log_p')
+	print(sum_dot_log_p)
 	likelihood = num_samples * (log_gamma_sum - sum_log_gamma + sum_dot_log_p)
 	return likelihood
 	
 def gradient_descent(num_steps, step_size):
-	alpha = np.random.rand(num_ECs)
+	alpha = np.random.ones(num_ECs)
 	assert(len(log_p) == len(alpha))
 	for i in range(num_steps):
 		alpha = update(alpha, step_size)
-		print likelihood(alpha)
+		print log_likelihood(alpha)
 	return alpha
