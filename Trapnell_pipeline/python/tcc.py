@@ -32,21 +32,24 @@ def get_unique_keys(list_dict):
 	keys = np.unique(keys)
 	return keys
 
-def normalize_counts(dictionary):
+def normalize_counts_with_median(dictionary):
         values = dictionary.values()
         median = np.median(values)
-        if median == 0:
-                print('median is 0')
-        else:
-                for key, value in dictionary.iteritems():
-                        dictionary[key]=value/median
+        for key, value in dictionary.iteritems():
+		dictionary[key]=value/median
         return dictionary
 
-def normalize_counts_with_log(dictionary):
+def normalize_counts_with_log_median(dictionary):
 	values = dictionary.values()
 	median = np.median(values)
 	for key, value in dictionary.iteritems():
-		dictionary[key]=(value/median+1.0)
+		dictionary[key]=np.log(value/median+1.0)
+	return dictionary
+
+def normalize_multinomial(dictionary):
+	total = np.sum(dictionary.values())
+	for key,value in dictionary.iteritems():
+		dictionary[key] = value/total
 	return dictionary
 
 def merge_dicts(dicts):
@@ -62,10 +65,11 @@ def merge_dicts(dicts):
 
 global num_samples
 global num_ECs
+
 def make_dictionary_of_TCCs(filenames):
 	x = map(read_classfile_into_dictionary, filenames)
 	print('normalizing counts')
-	x = map(normalize_counts, x)
+	x = map(normalize_multinomial, x)
 	d = merge_dicts(x)
 	global num_samples
 	global num_ECs
@@ -73,15 +77,21 @@ def make_dictionary_of_TCCs(filenames):
 	num_ECs = len(d.keys())
 	return d
 
+def turn_dict_into_list(dict_TCC):
+	list_TCC = []
+	for key in np.sort(dict_TCC.keys()):
+		list_TCC.append(dict_TCC[key])
+	assert(len(list_TCC) == num_ECs)
+	return list_TCC
 
-def plot_mean_var():
+def plot_mean_var(d):
 	mean = []
 	var = []
 	for key, value in d.iteritems():
 		this_mean = np.sum(value) / num_samples
 		this_var = np.var(list(value) + list(np.zeros(num_samples - len(value))))
-	mean.append(np.log(this_mean))
-	var.append(np.log(this_var))
+		mean.append(np.log(this_mean))
+		var.append(np.log(this_var))
 	fig, ax = plt.subplots()
 	ax.scatter(mean,var)
  	plt.savefig('mean_var_tcc_log_log_plus_one.png')
