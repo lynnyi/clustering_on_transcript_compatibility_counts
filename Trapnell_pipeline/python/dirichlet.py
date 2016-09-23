@@ -56,8 +56,9 @@ def log_likelihood(alpha):
 	return likelihood
 	
 def gradient_descent(num_steps, step_size):
-	alpha = np.random.ones(num_ECs)
+	alpha = np.ones(num_ECs)
 	assert(len(log_p) == len(alpha))
+	print((log_likelihood(alpha))
 	for i in range(num_steps):
 		alpha = update(alpha, step_size)
 		print log_likelihood(alpha)
