@@ -1,8 +1,6 @@
 
 import numpy as np
 import pandas as pd
-import os
-import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -22,7 +20,7 @@ def read_classfile_into_dictionary(filename):
 				print('error')
 			ec_num = line[0]
 			ec_count = line[1]
-			d[ec_num] = float(ec_count)
+			d[ec_num] = int(ec_count)
 	return d
 
 def get_unique_keys(list_dict):
@@ -32,24 +30,23 @@ def get_unique_keys(list_dict):
 	keys = np.unique(keys)
 	return keys
 
-def normalize_counts_with_median(dictionary):
+def normalize_median(dictionary):
         values = dictionary.values()
         median = np.median(values)
         for key, value in dictionary.iteritems():
-		dictionary[key]=value/median
+		dictionary[key]=float(value)/median
         return dictionary
 
-def normalize_counts_with_log_median(dictionary):
+def normalize_log_median(dictionary):
 	values = dictionary.values()
 	median = np.median(values)
 	for key, value in dictionary.iteritems():
-		dictionary[key]=np.log(value/median+1.0)
-	return dictionary
+		dictionary[key]=np.log(float(value)/median+1.0)
 
 def normalize_multinomial(dictionary):
 	total = np.sum(dictionary.values())
 	for key,value in dictionary.iteritems():
-		dictionary[key] = value/total
+		dictionary[key] = float(value)/total
 	return dictionary
 
 def merge_dicts(dicts):
@@ -68,14 +65,27 @@ global num_ECs
 
 def make_dictionary_of_TCCs(filenames):
 	x = map(read_classfile_into_dictionary, filenames)
-	print('normalizing counts')
-	x = map(normalize_multinomial, x)
+	#print('normalizing counts')
+	#x = map(normalize_median, x)
 	d = merge_dicts(x)
 	global num_samples
 	global num_ECs
 	num_samples = len(x)
 	num_ECs = len(d.keys())
 	return d
+
+global df
+def print_TCC_to_csv(filenames, filename):
+	x = map(read_classfile_into_dictionary, filenames)
+	global df
+	print('making dataframe')
+	df = pd.DataFrame(x)
+	print('filling NaNs')
+	df = df.fillna(value=0)
+	df = df.astype(int)
+	#assert(isinstance(df.iloc[[10],[11]], int))
+	df.to_csv(filename, header=False)
+	return
 
 def turn_dict_into_list(dict_TCC):
 	list_TCC = []
@@ -84,17 +94,20 @@ def turn_dict_into_list(dict_TCC):
 	assert(len(list_TCC) == num_ECs)
 	return list_TCC
 
+
 def plot_mean_var(d):
 	mean = []
 	var = []
 	for key, value in d.iteritems():
 		this_mean = np.sum(value) / num_samples
 		this_var = np.var(list(value) + list(np.zeros(num_samples - len(value))))
-		mean.append(np.log(this_mean))
-		var.append(np.log(this_var))
+		mean.append((this_mean))
+		var.append((this_var))
+	print('correl')
+	print(np.corrcoef(mean,var))
 	fig, ax = plt.subplots()
 	ax.scatter(mean,var)
- 	plt.savefig('mean_var_tcc_log_log_plus_one.png')
+ 	plt.savefig('mean_var_tcc_nonorm.png')
 
 
 

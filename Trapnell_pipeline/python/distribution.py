@@ -1,4 +1,6 @@
-
+# reads Trapnell TCC counts into dictionary
+# with normalizing options
+# then plots mean variance plots
 import numpy as np
 import pandas as pd
 import os

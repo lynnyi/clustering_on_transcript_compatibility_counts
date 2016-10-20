@@ -1,3 +1,6 @@
+# chooses subsamples of cells to quantify
+
+
 import os
 import getopt
 import pickle

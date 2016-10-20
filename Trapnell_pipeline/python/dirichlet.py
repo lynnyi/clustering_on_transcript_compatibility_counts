@@ -1,6 +1,12 @@
+# This file does clustering on Trapnell data then
+# arranges Trapnell 1st cluster into dictionary
+# of TCC counts indexed by TCC numbers
+# Attempted to fit to Dirichlet distribution
+# by gradient descent.
+# Lynn Yi October 2016
 
-import numpy as np
 import scipy.special as sp
+
 
 
 #load in the TCCs
@@ -18,11 +24,13 @@ num_ECs = num_ECs
 #num-samples
 num_samples = num_samples
 
+# todo: add the multiplicative factor
 #log_p is the sum of the log of the kth component over all the samples
 def calculate_log_p(ec_counts):
 	log_ec_counts = [map(np.log, x) for x in ec_counts]
 	log_p = np.array([np.sum(x) for x in log_ec_counts]) 
-	log_p /= num_samples
+	#i think this part of the paper is incorrect
+	#log_p /= num_samples
 	return log_p
 
 log_p = calculate_log_p(TCCs)
