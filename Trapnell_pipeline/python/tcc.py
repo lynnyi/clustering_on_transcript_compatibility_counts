@@ -1,4 +1,7 @@
 
+# problem with my method is I don't keep track of cell counts or distributions
+# better to stick with .dat file so nothing is removed
+# may TCC_version2 is actually to modify the tcc
 import numpy as np
 import pandas as pd
 matplotlib.use('Agg')

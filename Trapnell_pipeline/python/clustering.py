@@ -12,8 +12,8 @@ import random
 nclust = 3
 path_to_reads = '/home/vasilis/clustering_EQ/Trapnell/read_data/'
 ncells = 271
-filenames = np.loadtxt('/home/lynnyi/clustering/clustering_on_transcript_compatibility_counts/Trapnell_pipeline/Trapnells_data/Trapnell_filenames.txt',dtype=str)
-base_dir = '/home/lynnyi/clustering/clustering_on_transcript_compatibility_counts/Trapnell_pipeline/'
+filenames = np.loadtxt('/home/lynnyi//clustering_on_transcript_compatibility_counts/Trapnell_pipeline/Trapnells_data/Trapnell_filenames.txt',dtype=str)
+base_dir = '/home/lynnyi//clustering_on_transcript_compatibility_counts/Trapnell_pipeline/'
 
 
 def perform_clustering():
@@ -45,6 +45,7 @@ def perform_clustering():
 	from sklearn.metrics.pairwise import pairwise_distances
 	pref = -1.3*np.ones(ncells)
 	labels3=AffinityProp(-D,pref,0.95)
+	pickle.dump(labels3,open('labels.dat','wb'))
 	return labels3
 
 # get names of cells within each cluster
@@ -57,4 +58,4 @@ def get_names_per_cluster(labels):
 	return flnames_cluster
 
 
-
+perform_clustering()
